@@ -56,6 +56,7 @@ Non-Parametric Function Induction in Semi-Supervised Learning. AISTAT 2005
 from abc import ABCMeta, abstractmethod
 from scipy import sparse
 import numpy as np
+import warnings
 
 from ..base import BaseEstimator, ClassifierMixin
 from ..metrics.pairwise import rbf_kernel
@@ -64,6 +65,7 @@ from ..utils.extmath import safe_sparse_dot
 from ..utils.validation import check_X_y, check_is_fitted, check_array
 from ..utils.multiclass import check_classification_targets
 from ..externals import six
+from ..exceptions import ConvergenceWarning
 from ..neighbors.unsupervised import NearestNeighbors
 
 
@@ -254,6 +256,10 @@ class BaseLabelPropagation(six.with_metaclass(ABCMeta, BaseEstimator,
             self.label_distributions_ = np.multiply(
                 clamp_weights, self.label_distributions_) + y_static
             remaining_iter -= 1
+
+        if remaining_iter <= 1:
+            warnings.warn('max_iter was reached without convergence.',
+                          category=ConvergenceWarning)
 
         normalizer = np.sum(self.label_distributions_, axis=1)[:, np.newaxis]
         self.label_distributions_ /= normalizer
