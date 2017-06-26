@@ -4,6 +4,7 @@ import numpy as np
 
 from sklearn.utils.testing import assert_equal
 from sklearn.utils.testing import assert_warns
+from sklearn.utils.testing import assert_raises
 from sklearn.utils.testing import assert_no_warnings
 from sklearn.semi_supervised import label_propagation
 from sklearn.datasets import make_classification
@@ -117,3 +118,10 @@ def test_label_propagation():
     expected /= expected.sum(axis=1)[:, np.newaxis]
 
     assert_array_almost_equal(expected, clf.label_distributions_, 4)
+
+
+def test_valid_alpha():
+    assert_raises(ValueError, label_propagation.LabelSpreading, alpha=-0.1)
+    assert_raises(ValueError, label_propagation.LabelSpreading, alpha=0)
+    assert_raises(ValueError, label_propagation.LabelSpreading, alpha=1)
+    assert_raises(ValueError, label_propagation.LabelSpreading, alpha=1.1)
